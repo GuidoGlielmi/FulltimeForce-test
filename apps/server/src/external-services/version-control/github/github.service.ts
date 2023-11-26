@@ -17,16 +17,23 @@ export class GithubService implements IVersionControl {
 
   async get(repoName: string, page: number, perPage = 5) {
     try {
-      const { data: commits } = await this.octokit.rest.repos.listCommits({
-        owner: 'GuidoGlielmi',
-        repo: repoName,
-        per_page: perPage,
-        page,
-      });
-      return commits.map(this.mapCommit);
+      const { data: commits, headers } =
+        await this.octokit.rest.repos.listCommits({
+          owner: 'GuidoGlielmi',
+          repo: repoName,
+          per_page: perPage,
+          page,
+        });
+
+      const pageCount = this._responseLastPageExtractor(headers.link);
+      return { resource: commits.map(this.mapCommit), pageCount };
     } catch (err) {
       throw new HttpException(HttpStatus[err.status], err.status);
     }
+  }
+
+  private _responseLastPageExtractor(linkHeader: string) {
+    return +linkHeader.match(/.+page=(.+)>; rel="last"/)[1];
   }
 
   mapCommit(commit: TGithubCommit) {

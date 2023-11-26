@@ -1,5 +1,14 @@
+export interface IResource<T> {
+  resource: T[];
+  pageCount: number;
+}
+
 export interface IVersionControl {
-  get(repoName: string, page: number, perPage?: number): Promise<ICommit[]>;
+  get(
+    repoName: string,
+    page: number,
+    perPage?: number,
+  ): Promise<IResource<ICommit>>;
   mapCommit(commit: any): ICommit;
 }
 

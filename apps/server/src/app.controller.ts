@@ -1,5 +1,7 @@
-import { Controller, Get, Inject, Query } from '@nestjs/common';
+import { Controller, Get, Inject, Param, Query } from '@nestjs/common';
 import { IVersionControl } from './external-services/version-control/interfaces';
+import { GetCommitQueryDTO } from './dto/query/GetCommit';
+import { GetCommitParamsDTO } from './dto/params/GetCommit';
 
 @Controller()
 export class AppController {
@@ -8,11 +10,15 @@ export class AppController {
     private readonly versionControlService: IVersionControl,
   ) {}
 
-  @Get()
-  get(@Query() query: { repo_name: string; per_page?: number }) {
+  @Get('/:repoName')
+  get(
+    @Param() { repoName }: GetCommitParamsDTO,
+    @Query()
+    { per_page }: GetCommitQueryDTO,
+  ) {
     return this.versionControlService.get(
-      query.repo_name, // FulltimeForce-test
-      query.per_page,
+      repoName, // FulltimeForce-test
+      per_page,
     );
   }
 }

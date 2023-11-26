@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { GithubModule } from './external-services/version-control/github/github.module';
 
 describe('AppController', () => {
   let appController: AppController;
@@ -8,15 +8,18 @@ describe('AppController', () => {
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [AppController],
-      providers: [AppService],
+      imports: [GithubModule],
     }).compile();
 
     appController = app.get<AppController>(AppController);
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return "Hello World!"', async () => {
+      const response = await appController.get({
+        repo_name: 'FulltimeForce-test',
+      });
+      expect(response).toBeGreaterThan(0);
     });
   });
 });

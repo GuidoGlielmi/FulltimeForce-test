@@ -1,12 +1,18 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Get, Inject, Query } from '@nestjs/common';
+import { IVersionControl } from './external-services/version-control/interfaces';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    @Inject(IVersionControl)
+    private readonly versionControlService: IVersionControl,
+  ) {}
 
   @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  get(@Query() query: { repo_name: string; per_page?: number }) {
+    return this.versionControlService.get(
+      query.repo_name, // FulltimeForce-test
+      query.per_page,
+    );
   }
 }

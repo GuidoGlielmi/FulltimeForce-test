@@ -1,3 +1,4 @@
+import Toast from '@src/common/toast';
 import {
   createContext,
   useMemo,
@@ -20,7 +21,12 @@ const ErrorFeedbackProvider: FC<PropsWithChildren<ErrorFeedbackProviderProps>> =
   const [message, setMessage] = useState(false);
   const contextValue = useMemo(() => ({setMessage, message}), [message]);
   return (
-    <ErrorFeedbackContext.Provider value={contextValue}>{children}</ErrorFeedbackContext.Provider>
+    <ErrorFeedbackContext.Provider value={contextValue}>
+      <>
+        {message && <Toast content={message} />}
+        {children}
+      </>
+    </ErrorFeedbackContext.Provider>
   );
 };
 

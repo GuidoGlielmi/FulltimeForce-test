@@ -1,4 +1,4 @@
-import Toast from '@/src/common/toast';
+import Toast from '@/src/components/common/toast';
 import {createContext, useMemo, useState, FC, PropsWithChildren, useRef} from 'react';
 import {motion} from 'framer-motion';
 

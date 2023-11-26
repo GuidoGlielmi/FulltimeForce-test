@@ -1,4 +1,4 @@
-import Toast from '@src/common/toast';
+import Toast from '@/src/common/toast';
 import {
   createContext,
   useMemo,

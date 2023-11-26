@@ -14,10 +14,11 @@ export class AppController {
   async get(
     @Param() { repoName }: GetCommitParamsDTO,
     @Query()
-    { per_page }: GetCommitQueryDTO,
+    { per_page, page }: GetCommitQueryDTO,
   ) {
     return this.versionControlService.get(
       repoName, // FulltimeForce-test
+      page,
       per_page,
     );
   }

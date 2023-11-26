@@ -15,12 +15,13 @@ export class GithubService implements IVersionControl {
     });
   }
 
-  async get(repoName: string, perPage = 5) {
+  async get(repoName: string, page: number, perPage = 5) {
     try {
       const { data: commits } = await this.octokit.rest.repos.listCommits({
         owner: 'GuidoGlielmi',
         repo: repoName,
         per_page: perPage,
+        page,
       });
       return commits.map(this.mapCommit);
     } catch (err) {

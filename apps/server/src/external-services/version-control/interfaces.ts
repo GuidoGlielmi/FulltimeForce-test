@@ -1,5 +1,5 @@
 export interface IVersionControl {
-  get(repoName: string, perPage?: number): Promise<ICommit[]>;
+  get(repoName: string, page: number, perPage?: number): Promise<ICommit[]>;
   mapCommit(commit: any): ICommit;
 }
 

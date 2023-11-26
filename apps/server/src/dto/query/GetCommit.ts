@@ -5,4 +5,8 @@ export class GetCommitQueryDTO {
   @IsNumber()
   @Min(0)
   public per_page?: number;
+
+  @IsNumber()
+  @Min(0)
+  public page: number;
 }

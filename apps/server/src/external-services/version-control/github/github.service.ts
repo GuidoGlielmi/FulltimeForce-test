@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { IVersionControl } from '../interfaces';
 import { Octokit, RestEndpointMethodTypes } from '@octokit/rest';
 
@@ -16,12 +16,16 @@ export class GithubService implements IVersionControl {
   }
 
   async get(repoName: string, perPage = 5) {
-    const { data: commits } = await this.octokit.rest.repos.listCommits({
-      owner: 'GuidoGlielmi',
-      repo: repoName,
-      per_page: perPage,
-    });
-    return commits.map(this.mapCommit);
+    try {
+      const { data: commits } = await this.octokit.rest.repos.listCommits({
+        owner: 'GuidoGlielmi',
+        repo: repoName,
+        per_page: perPage,
+      });
+      return commits.map(this.mapCommit);
+    } catch (err) {
+      throw new HttpException(HttpStatus[err.status], err.status);
+    }
   }
 
   mapCommit(commit: TGithubCommit) {

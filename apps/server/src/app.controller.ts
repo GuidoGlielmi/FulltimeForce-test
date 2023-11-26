@@ -11,7 +11,7 @@ export class AppController {
   ) {}
 
   @Get('/:repoName')
-  get(
+  async get(
     @Param() { repoName }: GetCommitParamsDTO,
     @Query()
     { per_page }: GetCommitQueryDTO,

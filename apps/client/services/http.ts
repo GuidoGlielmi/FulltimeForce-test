@@ -74,8 +74,10 @@ async function tryFetch(
   }
 }
 
+export type TFetchMessage = 'Ha ocurrido un error' | '';
+
 class FetchResponse<T> {
-  public message: 'Ha ocurrido un error' | '';
+  public message: TFetchMessage;
   constructor(
     public data: T,
     public error: boolean,

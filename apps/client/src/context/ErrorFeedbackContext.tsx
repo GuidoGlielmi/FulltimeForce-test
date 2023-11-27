@@ -26,18 +26,17 @@ const ErrorFeedbackProvider: FC<PropsWithChildren<ErrorFeedbackProviderProps>> =
   const contextValue = useMemo(() => ({setToastOptions: setToastOptionsHandler}), []);
   return (
     <ErrorFeedbackContext.Provider value={contextValue}>
-      <>
-        <motion.div
-          animate={message ? 'open' : 'closed'}
-          variants={{
-            open: {x: 0, opacity: 1},
-            close: {x: '100%', opacity: 0},
-          }}
-        >
-          <Toast content={message} />
-        </motion.div>
-        {children}
-      </>
+      <motion.div
+        className='fixed top-0 right-0'
+        animate={message ? 'open' : 'closed'}
+        variants={{
+          open: {x: 0, opacity: 1},
+          close: {x: '100%', opacity: 0},
+        }}
+      >
+        <Toast content={message} color='#e62117' />
+      </motion.div>
+      {children}
     </ErrorFeedbackContext.Provider>
   );
 };

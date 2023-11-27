@@ -1,7 +1,11 @@
 import {ReactNode} from 'react';
 
-const Toast = ({content}: {content: ReactNode}) => {
-  return <div>{content}</div>;
+const Toast = ({content, color}: {content: ReactNode; color: string}) => {
+  return (
+    <div className='m-2 p-2 shadow' style={{color}}>
+      {content}
+    </div>
+  );
 };
 
 export default Toast;

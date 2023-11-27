@@ -9,5 +9,8 @@
   },
   "workspaces": [
     "apps/*"
-  ]
+  ],
+  "dependencies": {
+    "monorepo-globals": "*"
+  }
 }

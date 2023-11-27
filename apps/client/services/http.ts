@@ -21,7 +21,7 @@ export const httpService = async <T>({
       url,
       {
         method: method.toUpperCase(),
-        body: isFormData ? body : JSON.stringify(body),
+        body: body ? (isFormData ? body : JSON.stringify(body)) : undefined,
         headers,
       },
       abortController,

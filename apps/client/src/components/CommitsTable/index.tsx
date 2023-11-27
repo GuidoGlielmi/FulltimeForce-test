@@ -16,7 +16,7 @@ const CommitsTable = () => {
   const [page, setPage] = useState(0);
 
   const {data, loading, error} = useFetch<IResource<ICommit>>({
-    endpoint: 'Pragma-Guitar',
+    endpoint: 'FulltimeForce-test',
     query: {page: page + 1},
     isControlled: false,
   });

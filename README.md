@@ -4,8 +4,9 @@
 
 ### To start the project (in development)
 
+- `npm install`
 - `npm run dev`
 
-## To see live app
+### To see live app
 
 - Open in browser &rarr; http://localhost:5173

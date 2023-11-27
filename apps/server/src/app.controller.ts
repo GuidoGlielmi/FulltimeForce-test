@@ -16,10 +16,6 @@ export class AppController {
     @Query()
     { per_page, page }: GetCommitQueryDTO,
   ) {
-    return this.versionControlService.get(
-      repoName, // FulltimeForce-test
-      page,
-      per_page,
-    );
+    return this.versionControlService.get(repoName, page, per_page);
   }
 }

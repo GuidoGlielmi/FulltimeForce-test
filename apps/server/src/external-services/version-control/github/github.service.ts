@@ -28,6 +28,7 @@ export class GithubService implements IVersionControl {
       const pageCount = this._responseLastPageExtractor(headers.link);
       return { resource: commits.map(this.mapCommit), pageCount };
     } catch (err) {
+      console.log(err);
       throw new HttpException(HttpStatus[err.status], err.status);
     }
   }
@@ -37,6 +38,6 @@ export class GithubService implements IVersionControl {
   }
 
   mapCommit(commit: TGithubCommit) {
-    return commit.commit;
+    return { ...commit.commit, id: commit.sha, htmlUrl: commit.html_url };
   }
 }

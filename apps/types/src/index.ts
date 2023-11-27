@@ -1,6 +1,8 @@
 export const meaningOfLife = 42;
 export interface ICommit {
+  id: string;
   url: string;
+  htmlUrl: string;
   author: {
     name?: string;
     email?: string;
@@ -23,4 +25,8 @@ export interface ICommit {
     signature: string;
     payload: string;
   };
+}
+export interface IResource<T> {
+  resource: T[];
+  pageCount: number;
 }

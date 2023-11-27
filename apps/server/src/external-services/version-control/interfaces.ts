@@ -1,9 +1,4 @@
-import { ICommit } from 'monorepo-globals';
-
-export interface IResource<T> {
-  resource: T[];
-  pageCount: number;
-}
+import { ICommit, IResource } from 'monorepo-globals';
 
 export interface IVersionControl {
   get(

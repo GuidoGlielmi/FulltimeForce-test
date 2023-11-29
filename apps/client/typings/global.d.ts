@@ -1,3 +1,5 @@
+import {CancelController} from '@/services/http';
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export {};
 
@@ -7,7 +9,7 @@ declare global {
     method?: THttpServiceMethod;
     url: string;
     body?: FormData | T;
-    abortController?: AbortController;
+    cancelController?: CancelController;
   };
   export type Obj<T = any> = {[key: string]: T};
 }

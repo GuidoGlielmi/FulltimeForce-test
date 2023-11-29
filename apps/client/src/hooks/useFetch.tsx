@@ -1,13 +1,12 @@
-import {useCallback, useContext, useEffect, useState} from 'react';
-import {httpService} from '@/services/http';
+import {useCallback, useContext, useEffect, useRef, useState} from 'react';
+import {CancelController, httpService} from '@/services/http';
 import {ErrorFeedbackContext, ErrorFeedbackProps} from '@/src/context/ErrorFeedbackContext';
+import {TQuery} from '../helpers/query';
 
 export type TToastOptions = {
   errorMessage?: string;
   duration?: number;
 };
-
-type TQuery = {[key: string]: string | number};
 
 export interface IRequestOptions {
   url?: string;
@@ -17,7 +16,7 @@ export interface IRequestOptions {
   query?: TQuery;
   hideLoading?: boolean;
   toastOptions?: TToastOptions;
-  abortController?: AbortController;
+  cancelController?: CancelController;
 }
 
 export interface IUseFetch<T> extends Omit<IRequestOptions, 'abortController'> {
@@ -31,7 +30,6 @@ const useFetch = <T = any,>({
   url: defaultUrl = '',
   endpoint: defaultEndpoint = '',
   method: defaultMethod = 'get',
-  query: defaultQuery = {},
   body: defaultBody,
   isControlled = true,
   toastOptions: {errorMessage: defaultErrorMessage, duration: defaultDuration = 5} = {},
@@ -44,29 +42,28 @@ const useFetch = <T = any,>({
   const [data, setData] = useState<T | null>();
   const [loading, setLoading] = useState(!isControlled);
   const [error, setError] = useState(false);
+  const cancellerRef = useRef<CancelController>();
 
   const makeRequest = useCallback(
     async ({
       url = defaultUrl,
       method = defaultMethod,
       endpoint = defaultEndpoint,
-      query = defaultQuery,
       body = defaultBody,
       toastOptions: {errorMessage = defaultErrorMessage, duration = defaultDuration} = {},
-      abortController,
+      cancelController,
     }: IRequestOptions = {}) => {
+      console.log({defaultEndpoint});
+      cancellerRef.current = cancelController ?? new CancelController();
       setLoading(true);
 
       const fullUrl =
-        url ||
-        '/api' +
-          (!endpoint || endpoint.startsWith('/') ? endpoint : `/${endpoint}`) +
-          queryStringifier(query);
+        url || '/api' + (!endpoint || endpoint.startsWith('/') ? endpoint : `/${endpoint}`);
       const response = await httpService<T>({
         method,
         url: fullUrl,
         body,
-        abortController,
+        cancelController: cancellerRef.current,
       });
 
       setError(response.error);
@@ -93,20 +90,17 @@ const useFetch = <T = any,>({
       return response;
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [defaultEndpoint, queryStringifier(defaultQuery)],
+    [defaultEndpoint],
   );
 
   useEffect(() => {
     if (!isControlled) makeRequest();
+    return () => {
+      cancellerRef.current?.cancel();
+    };
   }, [makeRequest, isControlled]);
 
   return {makeRequest, data, setData, loading, error};
-};
-
-const queryStringifier = (query?: TQuery) => {
-  return query
-    ? '?' + Object.entries(query).reduce<string>((p, [k, v]) => `${p}${k}=${v}`, '')
-    : '';
 };
 
 export default useFetch;

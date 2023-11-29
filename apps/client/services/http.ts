@@ -1,3 +1,18 @@
+class CancelError extends Error {
+  name = 'CancelError';
+}
+
+export class CancelController {
+  public abortController = new AbortController();
+
+  abort(reason?: any) {
+    this.abortController.abort(reason);
+    this.abortController = new AbortController();
+  }
+  cancel() {
+    this.abort(new CancelError());
+  }
+}
 const contentTypes = {
   string: 'text/html',
   object: 'application/json',
@@ -7,7 +22,7 @@ export const httpService = async <T>({
   method = 'get',
   url,
   body,
-  abortController,
+  cancelController,
 }: THttpService<T>): Promise<FetchResponse<T | null>> => {
   const isFormData = typeof window !== 'undefined' && body instanceof FormData;
   const headers = {
@@ -24,7 +39,7 @@ export const httpService = async <T>({
         body: body ? (isFormData ? body : JSON.stringify(body)) : undefined,
         headers,
       },
-      abortController,
+      cancelController,
     );
     if (!rawRes) return unpredictableErrorResponse;
 
@@ -42,8 +57,7 @@ export const httpService = async <T>({
     res = res === 'null' ? null : res;
     return new FetchResponse(res, !rawRes.ok, rawRes.status);
   } catch (err: any) {
-    console.log(err);
-    return err === 'canceled' || err.name === 'AbortError'
+    return err instanceof CancelError || err.name === 'AbortError'
       ? canceledResponse
       : unpredictableErrorResponse;
   }
@@ -52,31 +66,36 @@ export const httpService = async <T>({
 async function tryFetch(
   url: string,
   options?: RequestInit,
-  abortController?: AbortController,
+  cancelController?: CancelController,
   retries = 3,
 ) {
   let remainingTries = retries;
+  const controller = cancelController || new CancelController();
   while (remainingTries > 0) {
-    const controller = abortController || new AbortController();
-    const timer = setTimeout(() => {
+    controller.abortController.signal.onabort = () => {
       remainingTries--;
-      console.log(`aborting... Remaining tries: ${remainingTries} of ${retries}`);
+      clearTimeout(timer);
+    };
+    const timer = setTimeout(() => {
       controller.abort();
     }, 20000);
     try {
-      const result = await fetch(url, {...options, signal: controller.signal});
+      const result = await fetch(url, {...options, signal: controller.abortController.signal});
       clearTimeout(timer);
       return result;
     } catch (err: any) {
-      console.log(err, err.name, err.status, err?.cause?.code);
-      if (err === 'canceled' || err.name !== 'AbortError') throw err;
+      console.log(err);
+      if (err instanceof CancelError || err.name !== 'AbortError') {
+        clearTimeout(timer);
+        throw err;
+      }
     }
   }
 }
 
 export type TFetchMessage = 'Ha ocurrido un error' | '';
 
-class FetchResponse<T> {
+export class FetchResponse<T> {
   public message: TFetchMessage;
   constructor(
     public data: T,
@@ -90,8 +109,7 @@ class FetchResponse<T> {
   }
 }
 
-const canceledResponse = new FetchResponse(null, false);
-
-const unpredictableErrorResponse = new FetchResponse(null, true);
+export const canceledResponse = new FetchResponse(null, false);
+export const unpredictableErrorResponse = new FetchResponse(null, true);
 
 export type TFetchResponse<T> = FetchResponse<T>;

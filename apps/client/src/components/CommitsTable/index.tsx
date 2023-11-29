@@ -6,6 +6,7 @@ import {FaChevronCircleLeft, FaChevronCircleRight, FaEllipsisH} from 'react-icon
 import {BiLoaderCircle} from 'react-icons/bi';
 import Commit from './Commit';
 import Header from './Header';
+import {queryStringifier} from '@/src/helpers/query';
 
 const commitsContainer =
   'flex flex-col justify-center gap-2 min-h-[500px] p-4 rounded-b-lg bg-[#cccccc22]';
@@ -16,8 +17,7 @@ const CommitsTable = () => {
   const [page, setPage] = useState(0);
 
   const {data, loading, error} = useFetch<IResource<ICommit>>({
-    endpoint: 'FulltimeForce-test',
-    query: {page: page + 1},
+    endpoint: 'FulltimeForce-test' + queryStringifier({page: page + 1}),
     isControlled: false,
   });
 
@@ -34,7 +34,7 @@ const CommitsTable = () => {
   };
 
   return (
-    <section className='flex flex-col gap-4 relative w-[80vw]'>
+    <section className='flex flex-col gap-4 relative w-[80vw] m-auto'>
       <div>
         <Header />
         <div

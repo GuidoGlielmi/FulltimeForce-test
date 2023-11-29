@@ -15,11 +15,12 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', async () => {
-      const response = await appController.get({
-        repo_name: 'FulltimeForce-test',
-      });
-      expect(response).toBeGreaterThan(0);
+    it('should return a filled array', async () => {
+      const response = await appController.get(
+        { repoName: 'FulltimeForce-test' },
+        { per_page: 5, page: 1 },
+      );
+      expect(response.resource.length).toBeGreaterThan(0);
     });
   });
 });

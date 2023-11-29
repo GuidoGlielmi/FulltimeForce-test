@@ -1,5 +1,5 @@
 import {useCallback, useContext, useEffect, useRef, useState} from 'react';
-import {CancelController, httpService} from '@/services/http';
+import {CancelController, canceledResponse, httpService} from '@/services/http';
 import {ErrorFeedbackContext, ErrorFeedbackProps} from '@/src/context/ErrorFeedbackContext';
 import {TQuery} from '../helpers/query';
 
@@ -42,7 +42,7 @@ const useFetch = <T = any,>({
   const [data, setData] = useState<T | null>();
   const [loading, setLoading] = useState(!isControlled);
   const [error, setError] = useState(false);
-  const cancellerRef = useRef<CancelController>();
+  const cancelControllerRef = useRef<CancelController>();
 
   const makeRequest = useCallback(
     async ({
@@ -53,8 +53,7 @@ const useFetch = <T = any,>({
       toastOptions: {errorMessage = defaultErrorMessage, duration = defaultDuration} = {},
       cancelController,
     }: IRequestOptions = {}) => {
-      console.log({defaultEndpoint});
-      cancellerRef.current = cancelController ?? new CancelController();
+      cancelControllerRef.current = cancelController ?? new CancelController();
       setLoading(true);
 
       const fullUrl =
@@ -63,11 +62,11 @@ const useFetch = <T = any,>({
         method,
         url: fullUrl,
         body,
-        cancelController: cancellerRef.current,
+        cancelController: cancelControllerRef.current,
       });
 
       setError(response.error);
-      setData(response.data);
+      if (response !== canceledResponse) setData(response.data);
 
       setLoading(false);
 
@@ -96,7 +95,7 @@ const useFetch = <T = any,>({
   useEffect(() => {
     if (!isControlled) makeRequest();
     return () => {
-      cancellerRef.current?.cancel();
+      cancelControllerRef.current?.cancel();
     };
   }, [makeRequest, isControlled]);
 

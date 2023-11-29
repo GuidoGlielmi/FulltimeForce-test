@@ -1,9 +1,8 @@
-import './App.css';
 import CommitsTable from './components/CommitsTable';
 
 function App() {
   return (
-    <div>
+    <div className='w-[100vw]'>
       <CommitsTable />
     </div>
   );

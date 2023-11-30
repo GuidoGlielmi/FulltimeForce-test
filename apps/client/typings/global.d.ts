@@ -5,7 +5,7 @@ export {};
 
 declare global {
   export type THttpServiceMethod = 'get' | 'post' | 'put' | 'delete';
-  export type THttpService<T> = {
+  export type THttpServiceArgs<T> = {
     method?: THttpServiceMethod;
     url: string;
     body?: BodyInit<T> | null | undefined;

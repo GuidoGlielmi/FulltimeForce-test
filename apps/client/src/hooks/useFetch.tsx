@@ -7,11 +7,15 @@ import {
   useRef,
   useState,
 } from 'react';
-import {CancelController, FetchResponse, canceledResponse, httpService} from '@/services/http';
+import {
+  CancelController,
+  THttpErrorStatusCode,
+  THttpService,
+  canceledResponse,
+  httpService,
+} from '@/services/http';
 import {ErrorFeedbackContext, ErrorFeedbackProps} from '@/src/context/ErrorFeedbackContext';
 import {TQuery} from '../helpers/query';
-
-export type THttpErrorStatusCode = 400 | 404 | 500;
 
 export type TToastOptions = {
   errorMessage?:
@@ -45,7 +49,7 @@ export interface IUseFetch<T> {
   error: boolean;
   loading: boolean;
   setData: Dispatch<SetStateAction<T | null>>;
-  makeRequest: (arg?: IRequestOptions) => Promise<FetchResponse<T | null>>;
+  makeRequest: (arg?: IRequestOptions) => THttpService<T>;
 }
 
 const useFetch = <T = any,>({

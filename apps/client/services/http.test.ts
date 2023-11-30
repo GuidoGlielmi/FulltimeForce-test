@@ -2,6 +2,8 @@ import {ICommit, IResource} from 'monorepo-globals';
 import {
   CancelController,
   FetchResponse,
+  TFetchResponseCanceled,
+  TFetchResponseError,
   canceledResponse,
   httpService,
   unpredictableErrorResponse,
@@ -18,15 +20,17 @@ it('should be populated', async () => {
 it('should be canceledErrorResponse', async () => {
   const cancelController = new CancelController();
   setTimeout(() => cancelController.cancel());
-  return httpService<null>({url, cancelController}).then((data: FetchResponse<null>) => {
-    expect(data).toBe(canceledResponse);
-  });
+  return (httpService({url, cancelController}) as Promise<TFetchResponseCanceled>).then(
+    (data: TFetchResponseCanceled) => {
+      expect(data).toBe(canceledResponse);
+    },
+  );
 });
 
 it('should be unpredictableErrorResponse 1', async () => {
   const cancelController = new CancelController();
   setTimeout(() => cancelController.abort('crash'));
-  return httpService<null>({url, cancelController}).then((data: FetchResponse<null>) => {
+  return (httpService({url, cancelController}) as Promise<TFetchResponseError>).then(data => {
     expect(data).toBe(unpredictableErrorResponse);
   });
 });
@@ -42,7 +46,7 @@ it('should be unpredictableErrorResponse 2', async () => {
   setTimeout(() => {
     cancelController.abort();
   });
-  return httpService<null>({url, cancelController}).then((data: FetchResponse<null>) => {
+  return (httpService({url, cancelController}) as Promise<TFetchResponseError>).then(data => {
     expect(data).toBe(unpredictableErrorResponse);
   });
 });

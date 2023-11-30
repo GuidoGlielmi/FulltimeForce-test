@@ -17,12 +17,20 @@ const contentTypes = {
   string: 'text/html',
   object: 'application/json',
 };
+
+export type THttpService<T = any> = Promise<
+  | TFetchResponseSuccess<T>
+  | TFetchResponseCanceled
+  | TFetchResponseError
+  | TFetchResponseErrorWithStatus
+>;
+
 export const httpService = async <T>({
   method = 'get',
   url,
   body,
   cancelController,
-}: THttpService<T>): Promise<FetchResponse<T | null>> => {
+}: THttpServiceArgs<T>): THttpService<T> => {
   const isFormData = typeof window !== 'undefined' && body instanceof FormData;
   const headers = {
     ...(!isFormData && {
@@ -43,7 +51,7 @@ export const httpService = async <T>({
     if (!rawRes) return unpredictableErrorResponse;
 
     if (!rawRes.ok) {
-      return new FetchResponse(null, true, rawRes.status);
+      return new FetchResponse(null, true, rawRes.status as THttpErrorStatusCode);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -54,7 +62,7 @@ export const httpService = async <T>({
       res = await rawRes.text();
     }
     res = res === 'null' ? null : res;
-    return new FetchResponse(res, !rawRes.ok, rawRes.status);
+    return new FetchResponse(res, !rawRes.ok, rawRes.status as THttpErrorStatusCode);
   } catch (err: any) {
     return err instanceof CancelError ? canceledResponse : unpredictableErrorResponse;
   }
@@ -87,12 +95,16 @@ export const genericErrorMessage = 'Ha ocurrido un error' as const;
 
 export type TFetchMessage = typeof genericErrorMessage | '';
 
-export class FetchResponse<T> {
+export class FetchResponse<
+  TData,
+  TError extends boolean,
+  TCode extends number | undefined = undefined,
+> {
   public message: TFetchMessage;
   constructor(
-    public data: T,
-    public error: boolean,
-    public code?: number,
+    public data: TData,
+    public error: TError,
+    public code?: TCode,
   ) {
     this.data = data;
     this.error = error;
@@ -101,7 +113,12 @@ export class FetchResponse<T> {
   }
 }
 
-export const canceledResponse = new FetchResponse(null, false);
-export const unpredictableErrorResponse = new FetchResponse(null, true);
+export type THttpErrorStatusCode = 400 | 404 | 500;
 
-export type TFetchResponse<T> = FetchResponse<T>;
+export type TFetchResponseSuccess<T> = FetchResponse<T, false, THttpErrorStatusCode>;
+export type TFetchResponseError = FetchResponse<null, true, undefined>;
+export type TFetchResponseErrorWithStatus = FetchResponse<null, true, THttpErrorStatusCode>;
+export type TFetchResponseCanceled = FetchResponse<null, false, undefined>;
+
+export const canceledResponse: TFetchResponseCanceled = new FetchResponse(null, false);
+export const unpredictableErrorResponse: TFetchResponseError = new FetchResponse(null, true);

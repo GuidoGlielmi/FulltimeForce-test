@@ -101,11 +101,6 @@ const useFetch = <T = any,>({
       if (response.error) {
         onResolveError?.();
         if (typeof errorMessage === 'object') {
-          console.log(
-            response.code,
-            errorMessage[response.code as THttpErrorStatusCode],
-            responseMessage,
-          );
           if (errorMessage[response.code as THttpErrorStatusCode])
             responseMessage = errorMessage[response.code as THttpErrorStatusCode]!;
         } else if (errorMessage) responseMessage = errorMessage;

@@ -10,3 +10,7 @@
 ### To see live app
 
 - Open in browser &rarr; http://localhost:5173
+
+### To run tests for both back-end and front-end apps
+
+- `npm run test`

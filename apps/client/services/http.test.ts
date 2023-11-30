@@ -9,13 +9,13 @@ import {
 
 const url = 'http://localhost:3000/api/FulltimeForce-test?page=1';
 
-test('response should be populated', async () => {
+it('should be populated', async () => {
   const data = await httpService<IResource<ICommit>>({url});
   expect(data).toBeInstanceOf(FetchResponse);
   expect(data.data?.resource?.length).toBeGreaterThan(0);
 });
 
-test('response should be canceledErrorResponse', async () => {
+it('should be canceledErrorResponse', async () => {
   const cancelController = new CancelController();
   setTimeout(() => cancelController.cancel());
   return httpService<null>({url, cancelController}).then((data: FetchResponse<null>) => {
@@ -23,7 +23,7 @@ test('response should be canceledErrorResponse', async () => {
   });
 });
 
-test('response should be unpredictableErrorResponse 1', async () => {
+it('should be unpredictableErrorResponse 1', async () => {
   const cancelController = new CancelController();
   setTimeout(() => cancelController.abort('crash'));
   return httpService<null>({url, cancelController}).then((data: FetchResponse<null>) => {
@@ -31,7 +31,7 @@ test('response should be unpredictableErrorResponse 1', async () => {
   });
 });
 
-test('response should be unpredictableErrorResponse 2', async () => {
+it('should be unpredictableErrorResponse 2', async () => {
   const cancelController = new CancelController();
   setTimeout(() => {
     cancelController.abort();

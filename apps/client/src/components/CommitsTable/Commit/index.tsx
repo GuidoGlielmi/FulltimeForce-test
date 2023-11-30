@@ -7,7 +7,7 @@ const columnStyle = {borderTop: '1px solid #444', borderBottom: '1px solid #2f2f
 const spanClassName = 'm-2 py-2 overflow-scroll';
 const Commit = ({commit}: CommitProps) => {
   return (
-    <div className={commitClassName}>
+    <div className={commitClassName} data-testid={commit.author.name}>
       <div style={columnStyle} className={columnClassName}>
         <span className={spanClassName}> {commit.message}</span>
       </div>

@@ -1,4 +1,4 @@
-class CancelError extends Error {
+export class CancelError extends Error {
   name = 'CancelError';
 }
 
@@ -17,7 +17,6 @@ const contentTypes = {
   string: 'text/html',
   object: 'application/json',
 };
-
 export const httpService = async <T>({
   method = 'get',
   url,
@@ -57,9 +56,7 @@ export const httpService = async <T>({
     res = res === 'null' ? null : res;
     return new FetchResponse(res, !rawRes.ok, rawRes.status);
   } catch (err: any) {
-    return err instanceof CancelError || err.name === 'AbortError'
-      ? canceledResponse
-      : unpredictableErrorResponse;
+    return err instanceof CancelError ? canceledResponse : unpredictableErrorResponse;
   }
 };
 
@@ -72,23 +69,16 @@ async function tryFetch(
   let remainingTries = retries;
   const controller = cancelController || new CancelController();
   while (remainingTries > 0) {
-    controller.abortController.signal.onabort = () => {
-      remainingTries--;
-      clearTimeout(timer);
-    };
-    const timer = setTimeout(() => {
-      controller.abort();
-    }, 20000);
+    const timer = setTimeout(() => controller.abort(), 20000);
     try {
       const result = await fetch(url, {...options, signal: controller.abortController.signal});
-      clearTimeout(timer);
       return result;
     } catch (err: any) {
       console.log(err);
-      if (err instanceof CancelError || err.name !== 'AbortError') {
-        clearTimeout(timer);
-        throw err;
-      }
+      if (err.name !== 'AbortError') throw err;
+      remainingTries--;
+    } finally {
+      clearTimeout(timer);
     }
   }
 }

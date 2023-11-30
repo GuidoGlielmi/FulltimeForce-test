@@ -1,13 +1,7 @@
 import {ICommit, IResource} from 'monorepo-globals';
-import {
-  CancelController,
-  FetchResponse,
-  TFetchResponseCanceled,
-  TFetchResponseError,
-  canceledResponse,
-  httpService,
-  unpredictableErrorResponse,
-} from './http';
+import {canceledResponse, httpService, unpredictableErrorResponse} from './http';
+import {FetchResponse} from '../helpers/FetchResponse';
+import {CancelController} from '../helpers/CancelController';
 
 const url = 'http://localhost:3000/api/FulltimeForce-test?page=1';
 

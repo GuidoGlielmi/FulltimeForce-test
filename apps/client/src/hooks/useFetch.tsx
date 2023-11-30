@@ -7,15 +7,10 @@ import {
   useRef,
   useState,
 } from 'react';
-import {
-  CancelController,
-  THttpErrorStatusCode,
-  THttpService,
-  canceledResponse,
-  httpService,
-} from '@/services/http';
+import {canceledResponse, httpService} from '@/src/services/http';
 import {ErrorFeedbackContext, ErrorFeedbackProps} from '@/src/context/ErrorFeedbackContext';
 import {TQuery} from '../helpers/query';
+import {CancelController} from '../helpers/CancelController';
 
 export type TToastOptions = {
   errorMessage?:

@@ -7,7 +7,9 @@ import {ICommit, IResource} from 'monorepo-globals';
 import {ErrorFeedbackContext} from '../context/ErrorFeedbackContext';
 import {PropsWithChildren} from 'react';
 import {act} from 'react-dom/test-utils';
-import {CancelController, CancelError, genericErrorMessage} from '@/services/http';
+import {CancelError} from '../helpers/CancelError';
+import {CancelController} from '../helpers/CancelController';
+import {genericErrorMessage} from '../services/http';
 
 const dummyCommitsData = {
   resource: [

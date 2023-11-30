@@ -8,7 +8,7 @@ declare global {
   export type THttpService<T> = {
     method?: THttpServiceMethod;
     url: string;
-    body?: FormData | T;
+    body?: BodyInit<T> | null | undefined;
     cancelController?: CancelController;
   };
   export type Obj<T = any> = {[key: string]: T};

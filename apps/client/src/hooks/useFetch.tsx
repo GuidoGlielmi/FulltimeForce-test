@@ -1,10 +1,24 @@
-import {useCallback, useContext, useEffect, useRef, useState} from 'react';
-import {CancelController, canceledResponse, httpService} from '@/services/http';
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import {CancelController, FetchResponse, canceledResponse, httpService} from '@/services/http';
 import {ErrorFeedbackContext, ErrorFeedbackProps} from '@/src/context/ErrorFeedbackContext';
 import {TQuery} from '../helpers/query';
 
+export type THttpErrorStatusCode = 400 | 404 | 500;
+
 export type TToastOptions = {
-  errorMessage?: string;
+  errorMessage?:
+    | string
+    | Partial<{
+        [K in THttpErrorStatusCode]: string;
+      }>;
   duration?: number;
 };
 
@@ -19,11 +33,19 @@ export interface IRequestOptions {
   cancelController?: CancelController;
 }
 
-export interface IUseFetch<T> extends Omit<IRequestOptions, 'abortController'> {
+export interface IUseFetchProps<T> extends Omit<IRequestOptions, 'abortController'> {
   isControlled?: boolean;
   onResolveSuccess?: (data: T) => void;
   onResolveError?: () => void;
   onResolve?: (data: T | null) => void;
+}
+
+export interface IUseFetch<T> {
+  data: T | null;
+  error: boolean;
+  loading: boolean;
+  setData: Dispatch<SetStateAction<T | null>>;
+  makeRequest: (arg?: IRequestOptions) => Promise<FetchResponse<T | null>>;
 }
 
 const useFetch = <T = any,>({
@@ -32,17 +54,18 @@ const useFetch = <T = any,>({
   method: defaultMethod = 'get',
   body: defaultBody,
   isControlled = true,
-  toastOptions: {errorMessage: defaultErrorMessage, duration: defaultDuration = 5} = {},
+  toastOptions: {errorMessage: defaultErrorMessage, duration: defaultDuration = 5000} = {},
   onResolveSuccess,
   onResolveError,
   onResolve,
-}: IUseFetch<T> = {}) => {
+  cancelController,
+}: IUseFetchProps<T> = {}): IUseFetch<T> => {
   const {setToastOptions} = useContext(ErrorFeedbackContext) as ErrorFeedbackProps;
 
-  const [data, setData] = useState<T | null>();
+  const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(!isControlled);
   const [error, setError] = useState(false);
-  const cancelControllerRef = useRef<CancelController>();
+  const cancelControllerRef = useRef(cancelController ?? new CancelController());
 
   const makeRequest = useCallback(
     async ({
@@ -53,7 +76,7 @@ const useFetch = <T = any,>({
       toastOptions: {errorMessage = defaultErrorMessage, duration = defaultDuration} = {},
       cancelController,
     }: IRequestOptions = {}) => {
-      cancelControllerRef.current = cancelController ?? new CancelController();
+      if (cancelController) cancelControllerRef.current = cancelController;
       setLoading(true);
 
       const fullUrl =
@@ -78,9 +101,15 @@ const useFetch = <T = any,>({
       if (response.error) {
         onResolveError?.();
         if (typeof errorMessage === 'object') {
-          if (errorMessage[response.code!]) responseMessage = errorMessage[response.code!]!;
+          console.log(
+            response.code,
+            errorMessage[response.code as THttpErrorStatusCode],
+            responseMessage,
+          );
+          if (errorMessage[response.code as THttpErrorStatusCode])
+            responseMessage = errorMessage[response.code as THttpErrorStatusCode]!;
         } else if (errorMessage) responseMessage = errorMessage;
-        setToastOptions({message: responseMessage, duration: duration * 1000});
+        setToastOptions({message: responseMessage, duration});
       } else {
         onResolveSuccess?.(response.data as T);
       }

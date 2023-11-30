@@ -83,7 +83,9 @@ async function tryFetch(
   }
 }
 
-export type TFetchMessage = 'Ha ocurrido un error' | '';
+export const genericErrorMessage = 'Ha ocurrido un error' as const;
+
+export type TFetchMessage = typeof genericErrorMessage | '';
 
 export class FetchResponse<T> {
   public message: TFetchMessage;

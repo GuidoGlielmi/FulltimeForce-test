@@ -9,7 +9,6 @@ import {
 } from 'react';
 import {canceledResponse, httpService} from '@/src/services/http';
 import {ErrorFeedbackContext, ErrorFeedbackProps} from '@/src/context/ErrorFeedbackContext';
-import {TQuery} from '../helpers/query';
 import {CancelController} from '../helpers/CancelController';
 
 export type TToastOptions = {
@@ -26,7 +25,6 @@ export interface IRequestOptions {
   method?: THttpServiceMethod;
   endpoint?: string;
   body?: any;
-  query?: TQuery;
   hideLoading?: boolean;
   toastOptions?: TToastOptions;
   cancelController?: CancelController;
@@ -80,6 +78,7 @@ const useFetch = <T = any,>({
 
       const fullUrl =
         url || '/api' + (!endpoint || endpoint.startsWith('/') ? endpoint : `/${endpoint}`);
+
       const response = await httpService<T>({
         method,
         url: fullUrl,

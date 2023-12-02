@@ -1,7 +1,7 @@
 export class FetchResponse<
   TData,
   TError extends boolean,
-  TCode extends number | undefined = undefined,
+  TCode extends THttpErrorStatusCode | undefined = undefined,
 > {
   public message: TFetchMessage;
   constructor(

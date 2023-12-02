@@ -30,8 +30,6 @@ export const httpService = async <T>({
       },
       cancelController,
     );
-    if (!rawRes) return unpredictableErrorResponse;
-
     if (!rawRes.ok) {
       return new FetchResponse(null, true, rawRes.status as THttpErrorStatusCode);
     }

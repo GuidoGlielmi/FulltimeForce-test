@@ -1,5 +1,6 @@
 import {CancelController} from '@/src/services/http';
 import {genericErrorMessage} from '@/src/services/http';
+import {FetchResponse} from '@/src/helpers/FetchResponse';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export {};
 

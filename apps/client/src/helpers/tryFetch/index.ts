@@ -1,10 +1,10 @@
-import {CancelController} from './CancelController';
-
+import {CancelController} from '../CancelController';
+export const DEFAULT_RETRIES_AMOUNT = 3;
 export async function tryFetch(
   url: string,
   options?: RequestInit,
   cancelController?: CancelController,
-  retries = 3,
+  retries = DEFAULT_RETRIES_AMOUNT,
 ) {
   let remainingTries = retries;
   const controller = cancelController || new CancelController();
@@ -15,10 +15,11 @@ export async function tryFetch(
       return result;
     } catch (err: any) {
       console.log(err);
-      if (err.name !== 'AbortError') throw err;
+      if (err?.name !== 'AbortError') throw err;
       remainingTries--;
     } finally {
       clearTimeout(timer);
     }
   }
+  throw new Error('timed out');
 }

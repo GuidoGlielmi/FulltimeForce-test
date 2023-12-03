@@ -10,7 +10,6 @@ import {act} from 'react-dom/test-utils';
 import {CancelError} from '../helpers/CancelError';
 import {CancelController} from '../helpers/CancelController';
 import {canceledResponse, genericErrorMessage} from '../services/http';
-import {DEFAULT_RETRIES_AMOUNT} from '../helpers/tryFetch';
 
 const dummyCommitsData = {
   resource: [

@@ -1,10 +1,9 @@
 /**
  * @jest-environment jsdom
  */
-import {act, render} from '@testing-library/react';
+import {act, render, waitFor} from '@testing-library/react';
 import CommitsTable from '../CommitsTable';
-import {PropsWithChildren, createContext} from 'react';
-import {ErrorFeedbackContext} from '@/src/context/ErrorFeedbackContext';
+import ErrorFeedbackProvider from '@/src/context/ErrorFeedbackContext';
 import {IResource} from 'monorepo-globals';
 
 const dummyCommitsData = {
@@ -161,18 +160,26 @@ global.fetch = jest.fn(() =>
   }),
 ) as any;
 
-const mockValue = {setToastOptions: () => {}};
-const ProviderWrapper = ({children}: PropsWithChildren) => (
-  <ErrorFeedbackContext.Provider value={mockValue}>{children}</ErrorFeedbackContext.Provider>
-);
-
 it('CommitsTable populates with 5 elements', async () => {
-  jest.mock('../../context/ErrorFeedbackContext', () => ({
-    __esModule: true,
-    default: createContext(mockValue),
-  }));
-  const commitsTableComponent = render(<CommitsTable />, {wrapper: ProviderWrapper});
+  const commitsTableComponent = render(
+    <ErrorFeedbackProvider>
+      <CommitsTable />
+    </ErrorFeedbackProvider>,
+  );
   await act(() => commitsTableComponent);
   const rows = commitsTableComponent.getAllByTestId('Guido Glielmi');
   expect(rows.length).toBe(5);
 });
+
+it('Toast should appear on error', async () => {
+  global.fetch = jest.fn(() => Promise.reject()) as any;
+
+  const errorFeedbackContext = render(
+    <ErrorFeedbackProvider>
+      <CommitsTable />
+    </ErrorFeedbackProvider>,
+  );
+  const toast = errorFeedbackContext.getByTestId('toast');
+  await waitFor(() => expect(toast.style.opacity).toBe('1') as any);
+  await waitFor(() => expect(toast.style.opacity).toBe('0'), {timeout: 5001});
+}, 6000);

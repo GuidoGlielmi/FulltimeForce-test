@@ -37,6 +37,7 @@ const ErrorFeedbackProvider: FC<PropsWithChildren<ErrorFeedbackProviderProps>> =
           open: {x: 0, opacity: 1},
           closed: {x: '100%', opacity: 0},
         }}
+        data-testid='toast'
       >
         <Toast content={toastOptions.message} color='#e62117' />
       </motion.div>
